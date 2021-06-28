@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -68,5 +70,12 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.i(TAG, "population failed"+response, throwable);
             }
         });
+    }
+
+    public void logout(View v){
+        // when the user clicks the log out button, end the intent and log the user out
+        Toast.makeText(getApplicationContext(), "You've been logged out", Toast.LENGTH_SHORT).show();
+        client.clearAccessToken(); // forget user
+        finish(); // exit to log in page
     }
 }

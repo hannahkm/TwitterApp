@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
 import org.jetbrains.annotations.NotNull;
@@ -74,7 +75,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvBody.setText(tweet.body);
             tvScreenName.setText(tweet.user.screenName);
             tvTimestamp.setText(tweet.getRelativeTimeAgo());
-            Glide.with(context).load(tweet.user.profileImageURL).into(ivProfileImage);
+            Glide.with(context).load(tweet.user.profileImageURL).transform(new RoundedCornersTransformation(100, 0)).into(ivProfileImage);
 
         }
     }
