@@ -1,11 +1,15 @@
 package com.codepath.apps.restclienttemplate;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,6 +18,7 @@ import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +28,7 @@ import okhttp3.Headers;
 public class TimelineActivity extends AppCompatActivity {
     TwitterClient client;
     public static final String TAG = "TimelineActivity";
+    public static final int REQUEST_CODE = 20;
     RecyclerView rvTweets;
     List<Tweet> tweets;
     TweetsAdapter adapter;
@@ -48,6 +54,44 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.setAdapter(adapter);
 
         populateHomeTimeline();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true; // return true to populate the menu
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.compose){
+            // we are clicking the compose button
+            // go the compose activity
+            Intent i = new Intent(this, ComposeActivity.class);
+            startActivityForResult(i, REQUEST_CODE);
+
+            return true; // true to consume tap and activate
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    // we get data back from the compose activity
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+        // if the returned data is valid
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+           // get data from the intent
+            Tweet tweet = Parcels.unwrap(data.getParcelableExtra("tweet"));
+
+           // update our recycler view with the new post
+            // 1. modify data source (aka the list of tweets)
+            tweets.add(0, tweet); // add to first position
+
+            // 2. update the adapter
+            adapter.notifyItemInserted(0); // new item at position 0
+            rvTweets.smoothScrollToPosition(0); // when going back, go to position 0
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void populateHomeTimeline() {
