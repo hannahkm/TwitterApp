@@ -6,22 +6,37 @@
     android:layout_height="match_parent"
     tools:context=".TimelineActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvTweets"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_margin="5dp">
 
-    <Button
-        android:id="@+id/logoutButton"
+        <android.widget.ListView
+            android:id="@+id/rvTweets"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:divider="@null"
+            android:dividerHeight="15dp" >
+
+        </android.widget.ListView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/compose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
-        android:text="Log Out"
-        android:onClick="logout"/>
+        android:backgroundTint="#1976D2"
+        android:clickable="true"
+        android:onClick="composeTweet"
+        app:srcCompat="@android:drawable/ic_menu_edit" />
+
 </RelativeLayout>

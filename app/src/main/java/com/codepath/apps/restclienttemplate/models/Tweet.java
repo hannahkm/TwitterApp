@@ -23,6 +23,7 @@ public class Tweet {
     public String body;
     public String createdAt;
     public User user;
+    public ArrayList entities;
 
     // empty constructor so we can parcel
     public Tweet() {}
@@ -33,6 +34,7 @@ public class Tweet {
         tweet.body = jsonObject.getString("text");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
+        tweet.entities = Entities.fromJson(jsonObject.getJSONObject("entities"));
 
         return tweet;
     }
@@ -46,6 +48,10 @@ public class Tweet {
 
         return tweets;
     }
+
+    public String getBody(){ return body; }
+
+    public User getUser(){ return user; }
 
     public String getRelativeTimeAgo() {
         String rawJsonDate = createdAt;

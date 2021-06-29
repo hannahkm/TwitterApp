@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvScreenName"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="1dp"
         android:layout_toEndOf="@+id/ivProfileImage"
         tools:text="I am coding Twitter." />
 
@@ -46,4 +46,20 @@
         android:layout_toEndOf="@+id/tvScreenName"
         android:textSize="12sp"
         tools:text="just now" />
+
+    <ImageView
+        android:id="@+id/ivMedia"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tvBody"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_toEndOf="@+id/ivProfileImage"
+        android:maxHeight="100dp"
+        android:scaleType="centerCrop"
+        tools:srcCompat="@tools:sample/avatars"
+        tools:visibility="gone" />
+
 </RelativeLayout>

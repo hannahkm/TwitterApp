@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
@@ -29,9 +31,11 @@ public class TimelineActivity extends AppCompatActivity {
     TwitterClient client;
     public static final String TAG = "TimelineActivity";
     public static final int REQUEST_CODE = 20;
-    RecyclerView rvTweets;
+    ListView rvTweets;
     List<Tweet> tweets;
     TweetsAdapter adapter;
+    TweetsAdapter2 adapter2;
+    private SwipeRefreshLayout swipeContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,15 +49,44 @@ public class TimelineActivity extends AppCompatActivity {
 
         // initialize list of tweets and the adapter
         tweets = new ArrayList<>();
-        adapter = new TweetsAdapter(this, tweets);
+        adapter2 = new TweetsAdapter2(this, tweets);
 
         // set up the recycler view (layout manager and adapter)
         //layout manager
-        rvTweets.setLayoutManager(new LinearLayoutManager(this));
+//        rvTweets.setLayoutManager(new LinearLayoutManager(this));
         //adapter
-        rvTweets.setAdapter(adapter);
+        rvTweets.setAdapter(adapter2);
 
         populateHomeTimeline();
+
+        swipeContainer = findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchTimelineAsync(0);
+            }
+        });
+    }
+
+    // to help us reset our timeline on pull down (reload)
+    private void fetchTimelineAsync(int page) {
+        client.getHomeTimeline(new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                // clear old items before generating and appending in the new ones
+                adapter2.clear();
+                populateHomeTimeline();
+                adapter2.addAll(tweets);
+                // signal refresh has finished
+                swipeContainer.setRefreshing(false);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.d("DEBUG", "Fetch timeline error: " + throwable.toString());
+            }
+        });
     }
 
     @Override
@@ -64,11 +97,11 @@ public class TimelineActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.compose){
-            // we are clicking the compose button
-            // go the compose activity
-            Intent i = new Intent(this, ComposeActivity.class);
-            startActivityForResult(i, REQUEST_CODE);
+        if (item.getItemId() == R.id.logoutButton){
+            // when the user clicks the log out button, end the intent and log the user out
+            Toast.makeText(getApplicationContext(), "You've been logged out", Toast.LENGTH_SHORT).show();
+            client.clearAccessToken(); // forget user
+            finish(); // exit to log in page
 
             return true; // true to consume tap and activate
         }
@@ -88,7 +121,7 @@ public class TimelineActivity extends AppCompatActivity {
             tweets.add(0, tweet); // add to first position
 
             // 2. update the adapter
-            adapter.notifyItemInserted(0); // new item at position 0
+            adapter2.notifyDataSetChanged(); // new item at position 0
             rvTweets.smoothScrollToPosition(0); // when going back, go to position 0
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -103,7 +136,7 @@ public class TimelineActivity extends AppCompatActivity {
                 try {
                     tweets.addAll(Tweet.fromJsonArray(jsonArray));
                     // tell the adapter the set is changed so it can be updated
-                    adapter.notifyDataSetChanged();
+                    adapter2.notifyDataSetChanged();
                 } catch (JSONException e) {
                     Log.e(TAG, "Json exception", e);
                 }
@@ -116,10 +149,10 @@ public class TimelineActivity extends AppCompatActivity {
         });
     }
 
-    public void logout(View v){
-        // when the user clicks the log out button, end the intent and log the user out
-        Toast.makeText(getApplicationContext(), "You've been logged out", Toast.LENGTH_SHORT).show();
-        client.clearAccessToken(); // forget user
-        finish(); // exit to log in page
+    public void composeTweet(View v) {
+        // we are clicking the compose button
+        // go the compose activity
+        Intent i = new Intent(this, ComposeActivity.class);
+        startActivityForResult(i, REQUEST_CODE);
     }
 }
