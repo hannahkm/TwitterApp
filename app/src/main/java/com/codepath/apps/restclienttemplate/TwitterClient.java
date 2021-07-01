@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.codepath.asynchttpclient.RequestParams;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -46,10 +47,19 @@ public class TwitterClient extends OAuthBaseClient {
 	// DEFINE METHODS for different API endpoints here
 	public void getHomeTimeline(JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
+		Log.i("TweetsAdapter", "home timeline: " + apiUrl);
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
-		params.put("count", 25); // number of tweets to pull
-		params.put("id", 1); //not much of a filter; most id's have value greater than 1
+		params.put("id", 1);
+		params.put("tweet_mode", "extended");
+		client.get(apiUrl, params, handler);
+	}
+
+	// for getting current user id
+	public void getUserData(JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("account/verify_credentials.json");
+		// Can specify query string params directly or through RequestParams.
+		RequestParams params = new RequestParams();
 		client.get(apiUrl, params, handler);
 	}
 
@@ -59,6 +69,38 @@ public class TwitterClient extends OAuthBaseClient {
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
 		params.put("status", tweetContent); // what we are posting
+		client.post(apiUrl, params, "", handler);
+	}
+
+	// for replying to tweets
+	public void replyTweet(String tweetContent, String tweetID, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/update.json");
+		// Can specify query string params directly or through RequestParams.
+		RequestParams params = new RequestParams();
+		params.put("status", tweetContent); // what we are posting
+		params.put("in_reply_to_status_id", tweetID); // tells us we're replying to someone
+		client.post(apiUrl, params, "", handler);
+	}
+
+	// for liking tweets
+	public void likeTweet(String tweetID, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("favorites/create.json");
+		Log.i("TweetsAdapter", apiUrl + " " + tweetID);
+
+		RequestParams params = new RequestParams();
+		params.put("id", tweetID); // tweet we're liking
+
+		client.post(apiUrl, params, "", handler);
+	}
+
+	// for disliking tweets
+	public void dislikeTweet(String tweetID, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("favorites/destroy.json");
+		Log.i("TweetsAdapter", apiUrl + " " + tweetID);
+
+		RequestParams params = new RequestParams();
+		params.put("id", tweetID); // tweet we're liking
+
 		client.post(apiUrl, params, "", handler);
 	}
 

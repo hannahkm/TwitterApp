@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DetailedActivity">
+
+    <ImageView
+        android:id="@+id/dvProfileImage"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/dvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="12dp"
+        android:layout_toEndOf="@+id/dvProfileImage"
+        android:textSize="20sp"
+        tools:text="Name Here" />
+
+    <ImageView
+        android:id="@+id/dvMedia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dvBody"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="5dp"
+        android:visibility="gone"
+        android:scaleType="centerCrop"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/dvBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dvProfileImage"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp"
+        android:textSize="18sp"
+        tools:text="Placeholder text" />
+
+    <TextView
+        android:id="@+id/dvRetweetCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dvMedia"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:textSize="15sp"
+        tools:text="# Retweets" />
+
+    <TextView
+        android:id="@+id/dvLikeCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dvMedia"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@+id/dvRetweetCount"
+        android:textSize="15sp"
+        tools:text="# Likes" />
+
+    <ImageView
+        android:id="@+id/ivLike"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dvLikeCount"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="15dp"
+        app:srcCompat="@drawable/ic_vector_heart_stroke" />
+
+    <ImageView
+        android:id="@+id/ivRetweet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dvLikeCount"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="15dp"
+        android:layout_toEndOf="@+id/ivLike"
+        app:srcCompat="@drawable/ic_vector_retweet_stroke" />
+
+    <ImageView
+        android:id="@+id/ivReply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/dvLikeCount"
+        android:layout_toEndOf="@+id/ivRetweet"
+        app:srcCompat="@drawable/ic_vector_compose_dm" />
+
+    <TextView
+        android:id="@+id/ivLikeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dvLikeCount"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="16dp"
+        android:layout_toEndOf="@+id/ivLike"
+        android:text="Like" />
+
+    <TextView
+        android:id="@+id/ivRetweetText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dvLikeCount"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="16dp"
+        android:layout_toEndOf="@+id/ivRetweet"
+        android:text="Retweet" />
+
+    <TextView
+        android:id="@+id/ivReplyText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dvLikeCount"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="16dp"
+        android:layout_toEndOf="@+id/ivReply"
+        android:text="Reply" />
+
+    <TextView
+        android:id="@+id/dvUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dvName"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="3dp"
+        android:layout_toEndOf="@+id/dvProfileImage"
+        android:textSize="16sp"
+        tools:text="usernma" />
+</RelativeLayout>

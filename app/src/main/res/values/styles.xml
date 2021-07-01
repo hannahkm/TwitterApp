@@ -1,6 +1,8 @@
 <resources>
 
-    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppBaseTheme" parent="Theme.AppCompat">
+        <item name="android:textColor">@color/light_gray</item>
+        <item name="android:backgroundTint">@color/dark_gray</item>
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to

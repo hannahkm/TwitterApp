@@ -38,7 +38,17 @@ public class ComposeActivity extends AppCompatActivity {
         etCompose = findViewById(R.id.etCompose);
         tweetBtn = findViewById(R.id.tweetBtn);
 
+        final boolean replying = getIntent().hasExtra("reply");
+        String tweetID = "";
+        if (replying){
+            etCompose.setText("@"+getIntent().getStringExtra("username"));
+            tweetID = getIntent().getStringExtra("tweetID");
+        } else {
+            etCompose.setText("");
+        }
+
         // click listener for tweet button
+        final String finalTweetID = tweetID;
         tweetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,32 +65,55 @@ public class ComposeActivity extends AppCompatActivity {
                     return;
                 }
 
-                // if no errors happen, we post the tweet!
-                client.publishTweet(content, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Headers headers, JSON json) {
-                        Log.i("ComposeActivity", "succeeded to publish tweet");
-                        try {
-                            Tweet tweet = Tweet.fromJson(json.jsonObject);
-                            Toast.makeText(ComposeActivity.this, "Your tweet has been posted!", Toast.LENGTH_SHORT).show();
-                            Log.i("ComposeActivity", "published tweet");
+                if (replying){
+                    // if no errors happen, we post the tweet!
+                    client.replyTweet(content, finalTweetID, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            try {
+                                Tweet tweet = Tweet.fromJson(json.jsonObject);
+                                Toast.makeText(ComposeActivity.this, "Your reply has been posted!", Toast.LENGTH_SHORT).show();
 
-                            // send data back to the previous activity using intents
-                            Intent i = new Intent();
-                            i.putExtra("tweet", Parcels.wrap(tweet)); // since tweet isn't recognized by Android, we parcel it
-                            setResult(RESULT_OK, i); // set result so we can read it
-                            finish();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                                // send data back to the previous activity using intents
+                                Intent i = new Intent();
+                                i.putExtra("tweet", Parcels.wrap(tweet)); // since tweet isn't recognized by Android, we parcel it
+                                setResult(RESULT_OK, i); // set result so we can read it
+                                finish();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                        Log.e("ComposeActivity", "failed to publish tweet", throwable);
-                    }
-                });
+                        @Override
+                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                        }
+                    });
+                } else {
+                    // if no errors happen, we post the tweet!
+                    client.publishTweet(content, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            try {
+                                Tweet tweet = Tweet.fromJson(json.jsonObject);
+                                Toast.makeText(ComposeActivity.this, "Your tweet has been posted!", Toast.LENGTH_SHORT).show();
 
+                                // send data back to the previous activity using intents
+                                Intent i = new Intent();
+                                i.putExtra("tweet", Parcels.wrap(tweet)); // since tweet isn't recognized by Android, we parcel it
+                                setResult(RESULT_OK, i); // set result so we can read it
+                                finish();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            Log.e("ComposeActivity", "failed to publish tweet", throwable);
+                        }
+                    });
+
+                }
             }
         });
     }

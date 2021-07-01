@@ -24,6 +24,10 @@ public class Tweet {
     public String createdAt;
     public User user;
     public ArrayList entities;
+    public int likes;
+    public int retweets;
+    public String id;
+    public Boolean liked;
 
     // empty constructor so we can parcel
     public Tweet() {}
@@ -31,10 +35,16 @@ public class Tweet {
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
         Tweet tweet = new Tweet();
 
-        tweet.body = jsonObject.getString("text");
+        Log.i("Tweet Input", String.valueOf(jsonObject));
+
+        tweet.body = jsonObject.getString("full_text");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
         tweet.entities = Entities.fromJson(jsonObject.getJSONObject("entities"));
+        tweet.likes = jsonObject.getInt("favorite_count");
+        tweet.retweets = jsonObject.getInt("retweet_count");
+        tweet.id = jsonObject.getString("id_str");
+        tweet.liked = jsonObject.getBoolean("favorited");
 
         return tweet;
     }
@@ -80,7 +90,6 @@ public class Tweet {
                 return diff / DAY_MILLIS + " d";
             }
         } catch (ParseException e) {
-            Log.i("Tweet Relative Time", "getRelativeTimeAgo failed");
             e.printStackTrace();
         }
 

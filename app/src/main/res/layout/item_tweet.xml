@@ -24,6 +24,8 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="0dp"
         android:layout_toEndOf="@+id/ivProfileImage"
+        android:maxLength="33"
+        android:textStyle="bold"
         tools:text="Hannah Kim" />
 
     <TextView
@@ -34,6 +36,8 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="1dp"
         android:layout_toEndOf="@+id/ivProfileImage"
+        android:autoLink="all"
+        android:linksClickable="true"
         tools:text="I am coding Twitter." />
 
     <TextView
@@ -43,7 +47,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="5dp"
         android:layout_marginTop="2dp"
-        android:layout_toEndOf="@+id/tvScreenName"
+        android:layout_toEndOf="@+id/tvUsername"
         android:textSize="12sp"
         tools:text="just now" />
 
@@ -61,5 +65,72 @@
         android:scaleType="centerCrop"
         tools:srcCompat="@tools:sample/avatars"
         tools:visibility="gone" />
+
+
+    <ImageView
+        android:id="@+id/ivLike"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivMedia"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@+id/ivProfileImage"
+        android:clickable="true"
+        android:onClick="likeTweet"
+        android:tag="heart_stroke"
+        android:src="@drawable/ic_vector_heart_stroke"
+        app:srcCompat="@drawable/ic_vector_heart_stroke" />
+
+    <ImageView
+        android:id="@+id/ivRetweet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@+id/ivLike"
+        android:layout_below="@+id/ivMedia"
+        app:srcCompat="@drawable/ic_vector_retweet_stroke" />
+
+    <ImageView
+        android:id="@+id/ivReply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@+id/ivRetweet"
+        android:layout_below="@+id/ivMedia"
+        app:srcCompat="@drawable/ic_vector_compose_dm" />
+
+    <TextView
+        android:id="@+id/ivLikeCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="6dp"
+        android:layout_toEndOf="@+id/ivLike"
+        android:layout_below="@+id/ivMedia"
+        tools:text="Num Likes" />
+
+    <TextView
+        android:id="@+id/ivRetweetCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="6dp"
+        android:layout_toEndOf="@+id/ivRetweet"
+        android:layout_below="@+id/ivMedia"
+        tools:text="Num Retweet" />
+
+    <TextView
+        android:id="@+id/tvUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="false"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@+id/tvScreenName"
+        android:maxLength="13"
+        android:textSize="14sp"
+        tools:text="/@hnkim101" />
 
 </RelativeLayout>

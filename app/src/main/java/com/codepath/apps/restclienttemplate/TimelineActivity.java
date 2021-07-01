@@ -12,14 +12,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
@@ -27,11 +31,12 @@ import java.util.List;
 
 import okhttp3.Headers;
 
-public class TimelineActivity extends AppCompatActivity {
+public class TimelineActivity extends AppCompatActivity implements TweetsAdapter2.onClickListener{
     TwitterClient client;
     public static final String TAG = "TimelineActivity";
     public static final int REQUEST_CODE = 20;
     ListView rvTweets;
+    List<Tweet> timeline;
     List<Tweet> tweets;
     TweetsAdapter adapter;
     TweetsAdapter2 adapter2;
@@ -44,18 +49,31 @@ public class TimelineActivity extends AppCompatActivity {
 
         client = TwitterApp.getRestClient(this);
 
-        // get recycler view
+        // get list view
         rvTweets = findViewById(R.id.rvTweets);
+
+        rvTweets.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to your AdapterView
+                loadNextDataFromApi(page);
+                // or loadNextDataFromApi(totalItemsCount);
+                return true; // ONLY if more data is actually being loaded; false otherwise.
+            }
+        });
 
         // initialize list of tweets and the adapter
         tweets = new ArrayList<>();
-        adapter2 = new TweetsAdapter2(this, tweets);
+        timeline = new ArrayList<>();
+        adapter2 = new TweetsAdapter2(this, tweets, this);
 
         // set up the recycler view (layout manager and adapter)
         //layout manager
 //        rvTweets.setLayoutManager(new LinearLayoutManager(this));
         //adapter
         rvTweets.setAdapter(adapter2);
+        rvTweets.setOnItemClickListener(messageClickedHandler);
 
         populateHomeTimeline();
 
@@ -67,7 +85,28 @@ public class TimelineActivity extends AppCompatActivity {
                 fetchTimelineAsync(0);
             }
         });
+
     }
+
+    // Append the next page of data into the adapter
+    // This method probably sends out a network request and appends new data items to your adapter.
+    public void loadNextDataFromApi(int offset) {
+        // Send an API request to retrieve appropriate paginated data
+        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
+        //  --> Deserialize and construct new model objects from the API response
+        //  --> Append the new data objects to the existing set of items inside the array of items
+        //  --> Notify the adapter of the new items made with `notifyDataSetChanged()`
+    }
+
+    // Create a message handling object as an anonymous class.
+    AdapterView.OnItemClickListener messageClickedHandler = new AdapterView.OnItemClickListener() {
+        public void onItemClick(AdapterView parent, View v, int position, long id) {
+            Intent i = new Intent(TimelineActivity.this, DetailedActivity.class);
+            i.putExtra("tweet", Parcels.wrap(tweets.get(position)));
+            i.putExtra("tweetPosition", position);
+            startActivity(i);
+        }
+    };
 
     // to help us reset our timeline on pull down (reload)
     private void fetchTimelineAsync(int page) {
@@ -84,7 +123,7 @@ public class TimelineActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                Log.d("DEBUG", "Fetch timeline error: " + throwable.toString());
+                Log.d("DEBUG", "Fetch timeline error: " + response + throwable.toString());
             }
         });
     }
@@ -154,5 +193,72 @@ public class TimelineActivity extends AppCompatActivity {
         // go the compose activity
         Intent i = new Intent(this, ComposeActivity.class);
         startActivityForResult(i, REQUEST_CODE);
+    }
+
+    @Override
+    public void onTweetReplied(int position) {
+        final Tweet tweet = tweets.get(position);
+        Intent i = new Intent(this, ComposeActivity.class);
+        i.putExtra("reply", true);
+        i.putExtra("username", tweet.user.name);
+        i.putExtra("tweetID", tweet.id);
+        startActivityForResult(i, REQUEST_CODE);
+    }
+
+    @Override
+    public void onImageOpened(int position) {
+        final ImageView popup = findViewById(R.id.popupImage);
+        final ImageView closeButton = findViewById(R.id.closePopup);
+        Tweet tweet = tweets.get(position);
+
+        popup.setVisibility(View.VISIBLE);
+        String baseURL = String.valueOf(tweet.entities.get(0));
+        String imageURL = baseURL.substring(0, baseURL.length()-4)+"?format=jpg&name=medium";
+        Glide.with(this).load(imageURL).fitCenter().into(popup);
+
+        closeButton.setVisibility(View.VISIBLE);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popup.setVisibility(View.GONE);
+                closeButton.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    @Override
+    public void onTweetLiked(int position) {
+        final Tweet tweet = tweets.get(position);
+
+        if (tweet.liked){
+            tweet.liked = false;
+            tweet.likes -= 1;
+                client.dislikeTweet(tweet.id, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Headers headers, JSON json) {
+                        return;
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                        Log.d("TweetsAdapter", "Fetch like error: " + throwable.toString() + statusCode);
+                    }
+                });
+        } else {
+            tweet.liked = true;
+            tweet.likes += 1;
+                client.likeTweet(tweet.id, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Headers headers, JSON json) {
+                        tweet.liked = true;
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                        Log.d("TweetsAdapter", "Fetch like error: " + throwable.toString() + statusCode);
+                    }
+                });
+        }
+        adapter2.notifyDataSetChanged();
     }
 }
