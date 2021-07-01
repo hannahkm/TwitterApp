@@ -135,7 +135,7 @@ public class TimelineActivity extends AppCompatActivity implements TweetsAdapter
            // update our recycler view with the new post
             tweets.add(0, tweet); // add to first position
             adapter2.notifyDataSetChanged(); // new item at position 0
-            rvTweets.smoothScrollToPosition(-1); // when going back, go to position 0
+            rvTweets.smoothScrollToPosition(0); // when going back, go to position 0
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
