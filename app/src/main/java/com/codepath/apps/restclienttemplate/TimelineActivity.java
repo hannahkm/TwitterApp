@@ -52,33 +52,20 @@ public class TimelineActivity extends AppCompatActivity implements TweetsAdapter
         // get list view
         rvTweets = findViewById(R.id.rvTweets);
 
-        rvTweets.setOnScrollListener(new EndlessScrollListener() {
-            @Override
-            public boolean onLoadMore(int page, int totalItemsCount) {
-                // Triggered only when new data needs to be appended to the list
-                // Add whatever code is needed to append new items to your AdapterView
-                loadNextDataFromApi(page);
-                // or loadNextDataFromApi(totalItemsCount);
-                return true; // ONLY if more data is actually being loaded; false otherwise.
-            }
-        });
-
         // initialize list of tweets and the adapter
         tweets = new ArrayList<>();
         timeline = new ArrayList<>();
         adapter2 = new TweetsAdapter2(this, tweets, this);
 
         // set up the recycler view (layout manager and adapter)
-        //layout manager
-//        rvTweets.setLayoutManager(new LinearLayoutManager(this));
-        //adapter
         rvTweets.setAdapter(adapter2);
         rvTweets.setOnItemClickListener(messageClickedHandler);
 
+        // fill user's timeline w tweets
         populateHomeTimeline();
 
+        // allows user to pull container down to refresh
         swipeContainer = findViewById(R.id.swipeContainer);
-        // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -88,17 +75,7 @@ public class TimelineActivity extends AppCompatActivity implements TweetsAdapter
 
     }
 
-    // Append the next page of data into the adapter
-    // This method probably sends out a network request and appends new data items to your adapter.
-    public void loadNextDataFromApi(int offset) {
-        // Send an API request to retrieve appropriate paginated data
-        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
-        //  --> Deserialize and construct new model objects from the API response
-        //  --> Append the new data objects to the existing set of items inside the array of items
-        //  --> Notify the adapter of the new items made with `notifyDataSetChanged()`
-    }
-
-    // Create a message handling object as an anonymous class.
+    // allows user to click on an item and view its details
     AdapterView.OnItemClickListener messageClickedHandler = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView parent, View v, int position, long id) {
             Intent i = new Intent(TimelineActivity.this, DetailedActivity.class);
@@ -156,16 +133,14 @@ public class TimelineActivity extends AppCompatActivity implements TweetsAdapter
             Tweet tweet = Parcels.unwrap(data.getParcelableExtra("tweet"));
 
            // update our recycler view with the new post
-            // 1. modify data source (aka the list of tweets)
             tweets.add(0, tweet); // add to first position
-
-            // 2. update the adapter
             adapter2.notifyDataSetChanged(); // new item at position 0
-            rvTweets.smoothScrollToPosition(0); // when going back, go to position 0
+            rvTweets.smoothScrollToPosition(-1); // when going back, go to position 0
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    // add tweets to the user's timeline to be viewed
     private void populateHomeTimeline() {
         client.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
@@ -196,6 +171,7 @@ public class TimelineActivity extends AppCompatActivity implements TweetsAdapter
     }
 
     @Override
+    // also opens compose activity to reply to tweets
     public void onTweetReplied(int position) {
         final Tweet tweet = tweets.get(position);
         Intent i = new Intent(this, ComposeActivity.class);
@@ -206,6 +182,29 @@ public class TimelineActivity extends AppCompatActivity implements TweetsAdapter
     }
 
     @Override
+    // automatically retweets for the user
+    public void onRetweet(int position) {
+        final Tweet tweet = tweets.get(position);
+        final String tweetID = tweet.id;
+        client.retweet(tweetID, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                tweet.retweeted = true;
+                adapter2.notifyDataSetChanged();
+                rvTweets.smoothScrollToPosition(0);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.d("TweetsAdapter", "Fetch like error: " + throwable.toString() + statusCode);
+            }
+        });
+
+    }
+
+    @Override
+    // opens a popup window to view an image
+    // also allows user to close the popup using a FAB close button
     public void onImageOpened(int position) {
         final ImageView popup = findViewById(R.id.popupImage);
         final ImageView closeButton = findViewById(R.id.closePopup);
@@ -227,16 +226,15 @@ public class TimelineActivity extends AppCompatActivity implements TweetsAdapter
     }
 
     @Override
+    // checks if tweet is liked/disliked and dislikes/likes it accordingly
     public void onTweetLiked(int position) {
         final Tweet tweet = tweets.get(position);
-
         if (tweet.liked){
-            tweet.liked = false;
-            tweet.likes -= 1;
                 client.dislikeTweet(tweet.id, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
-                        return;
+                        tweet.liked = false;
+                        tweet.likes -= 1;
                     }
 
                     @Override
@@ -245,12 +243,11 @@ public class TimelineActivity extends AppCompatActivity implements TweetsAdapter
                     }
                 });
         } else {
-            tweet.liked = true;
-            tweet.likes += 1;
                 client.likeTweet(tweet.id, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
                         tweet.liked = true;
+                        tweet.likes += 1;
                     }
 
                     @Override
@@ -259,6 +256,7 @@ public class TimelineActivity extends AppCompatActivity implements TweetsAdapter
                     }
                 });
         }
+        // update the adapter
         adapter2.notifyDataSetChanged();
     }
 }

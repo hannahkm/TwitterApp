@@ -16,12 +16,6 @@ import org.parceler.Parcels;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class DetailedActivity extends AppCompatActivity {
-    public interface onClickListener {
-        void onTweetLiked(int position);
-        void onTweetReplied(int position);
-    }
-
-    onClickListener onClickListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,13 +23,11 @@ public class DetailedActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detailed);
 
         final Tweet tweet = Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
-        final int position = getIntent().getIntExtra("position", 0);
 
         // populate item view with tweet info and profile pic
         ((TextView) findViewById(R.id.dvBody)).setText(tweet.body);
         ((TextView) findViewById(R.id.dvName)).setText(tweet.user.name);
         ((TextView) findViewById(R.id.dvUsername)).setText("@"+tweet.user.screenName);
-//        ((TextView) findViewById(R.id.tvTimestamp)).setText(tweet.getRelativeTimeAgo());
         ((TextView) findViewById(R.id.dvLikeCount)).setText(String.valueOf(tweet.likes) + " Likes");
         ((TextView) findViewById(R.id.dvRetweetCount)).setText(String.valueOf(tweet.retweets) + " Retweets");
 

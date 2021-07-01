@@ -38,6 +38,7 @@ public class ComposeActivity extends AppCompatActivity {
         etCompose = findViewById(R.id.etCompose);
         tweetBtn = findViewById(R.id.tweetBtn);
 
+        // checks if the user is replying to a tweet and reformats the EditText if so
         final boolean replying = getIntent().hasExtra("reply");
         String tweetID = "";
         if (replying){
@@ -65,8 +66,8 @@ public class ComposeActivity extends AppCompatActivity {
                     return;
                 }
 
+                // calling different functions for replying vs posting tweets
                 if (replying){
-                    // if no errors happen, we post the tweet!
                     client.replyTweet(content, finalTweetID, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
@@ -78,7 +79,6 @@ public class ComposeActivity extends AppCompatActivity {
                                 Intent i = new Intent();
                                 i.putExtra("tweet", Parcels.wrap(tweet)); // since tweet isn't recognized by Android, we parcel it
                                 setResult(RESULT_OK, i); // set result so we can read it
-                                finish();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -86,6 +86,7 @@ public class ComposeActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            Log.e("ComposeActivity", "failed to reply to tweet", throwable);
                         }
                     });
                 } else {
@@ -101,7 +102,6 @@ public class ComposeActivity extends AppCompatActivity {
                                 Intent i = new Intent();
                                 i.putExtra("tweet", Parcels.wrap(tweet)); // since tweet isn't recognized by Android, we parcel it
                                 setResult(RESULT_OK, i); // set result so we can read it
-                                finish();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -114,6 +114,7 @@ public class ComposeActivity extends AppCompatActivity {
                     });
 
                 }
+                finish(); // end current activity
             }
         });
     }

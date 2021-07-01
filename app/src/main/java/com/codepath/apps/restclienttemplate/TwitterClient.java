@@ -47,7 +47,6 @@ public class TwitterClient extends OAuthBaseClient {
 	// DEFINE METHODS for different API endpoints here
 	public void getHomeTimeline(JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
-		Log.i("TweetsAdapter", "home timeline: " + apiUrl);
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
 		params.put("id", 1);
@@ -85,7 +84,6 @@ public class TwitterClient extends OAuthBaseClient {
 	// for liking tweets
 	public void likeTweet(String tweetID, JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("favorites/create.json");
-		Log.i("TweetsAdapter", apiUrl + " " + tweetID);
 
 		RequestParams params = new RequestParams();
 		params.put("id", tweetID); // tweet we're liking
@@ -96,7 +94,16 @@ public class TwitterClient extends OAuthBaseClient {
 	// for disliking tweets
 	public void dislikeTweet(String tweetID, JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("favorites/destroy.json");
-		Log.i("TweetsAdapter", apiUrl + " " + tweetID);
+
+		RequestParams params = new RequestParams();
+		params.put("id", tweetID); // tweet we're liking
+
+		client.post(apiUrl, params, "", handler);
+	}
+
+	// for retweeting
+	public void retweet(String tweetID, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/retweet/"+tweetID+".json");
 
 		RequestParams params = new RequestParams();
 		params.put("id", tweetID); // tweet we're liking

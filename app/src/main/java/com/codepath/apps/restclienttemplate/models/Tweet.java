@@ -28,6 +28,7 @@ public class Tweet {
     public int retweets;
     public String id;
     public Boolean liked;
+    public Boolean retweeted;
 
     // empty constructor so we can parcel
     public Tweet() {}
@@ -37,7 +38,7 @@ public class Tweet {
 
         Log.i("Tweet Input", String.valueOf(jsonObject));
 
-        tweet.body = jsonObject.getString("full_text");
+        tweet.body = jsonObject.getString("full_text"); // full, nontruncated text
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
         tweet.entities = Entities.fromJson(jsonObject.getJSONObject("entities"));
@@ -45,10 +46,12 @@ public class Tweet {
         tweet.retweets = jsonObject.getInt("retweet_count");
         tweet.id = jsonObject.getString("id_str");
         tweet.liked = jsonObject.getBoolean("favorited");
+        tweet.retweeted = jsonObject.getBoolean("retweeted");
 
         return tweet;
     }
 
+    // returns a list of tweets from a given json dataset
     public static List<Tweet> fromJsonArray(JSONArray jsonArray) throws JSONException {
         List<Tweet> tweets = new ArrayList<>();
 
@@ -59,10 +62,8 @@ public class Tweet {
         return tweets;
     }
 
-    public String getBody(){ return body; }
-
-    public User getUser(){ return user; }
-
+    // calculates the amount of time since the tweet was posted
+    // formats the time in twitter's format
     public String getRelativeTimeAgo() {
         String rawJsonDate = createdAt;
         String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";

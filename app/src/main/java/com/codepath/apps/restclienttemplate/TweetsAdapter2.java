@@ -38,18 +38,20 @@ public class TweetsAdapter2 extends BaseAdapter {
     List<Tweet> tweets;
     ImageView likeButton;
     ImageView replyButton;
+    ImageView retweetButton;
     TwitterClient client;
     Tweet tweet;
 
     public interface onClickListener {
         void onTweetLiked(int position);
         void onTweetReplied(int position);
+        void onRetweet(int position);
         void onImageOpened(int position);
     }
 
     onClickListener onClickListener;
 
-    // Pass in context and lists of Tweets
+    // Pass in context, lists of Tweets, and our click listener
     public TweetsAdapter2(Context context, List<Tweet> tweets, onClickListener onClickListener) {
         this.context = context;
         this.tweets = tweets;
@@ -98,6 +100,7 @@ public class TweetsAdapter2 extends BaseAdapter {
             String imageURL = baseURL.substring(0, baseURL.length()-4)+"?format=jpg&name=small";
             Glide.with(context).load(imageURL).override(Target.SIZE_ORIGINAL, 500).transform(new RoundedCornersTransformation(20, 0)).into(ivMedia);
 
+            // open the image in a popup window when clicked on
             ivMedia.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -106,6 +109,7 @@ public class TweetsAdapter2 extends BaseAdapter {
             });
         }
 
+        // liking tweets: changes the drawable on click
         likeButton = convertView.findViewById(R.id.ivLike);
         if (tweet.liked) {
             likeButton.setImageResource(R.drawable.ic_vector_heart);
@@ -117,23 +121,38 @@ public class TweetsAdapter2 extends BaseAdapter {
                 Tweet tweetLiked = tweets.get(position);
                 if (tweetLiked.liked) {
                     likeButton.setImageResource(R.drawable.ic_vector_heart_stroke);
-//                    tweetLiked.liked = false;
                 } else {
                     likeButton.setImageResource(R.drawable.ic_vector_heart);
-//                    tweetLiked.liked = true;
                 }
                 onClickListener.onTweetLiked(position);
-                notifyDataSetChanged();
-
+                notifyDataSetChanged(); // update the adapter w new data from listener
             }
         });
 
+        // replying to tweets
         replyButton = convertView.findViewById(R.id.ivReply);
-
         replyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onClickListener.onTweetReplied(position);
+            }
+        });
+
+        // retweeting: also changes image on click
+        retweetButton = convertView.findViewById(R.id.ivRetweet);
+        if (tweet.retweeted) {
+            retweetButton.setImageResource(R.drawable.ic_vector_retweet);
+        }
+
+        retweetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Tweet retweeted = tweets.get(position);
+                if (!retweeted.retweeted) {
+                    retweetButton.setImageResource(R.drawable.ic_vector_retweet);
+                }
+                onClickListener.onRetweet(position);
+                notifyDataSetChanged();
             }
         });
 

@@ -2,6 +2,8 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:backgroundTint="@color/black"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".TimelineActivity"
     >
 
     <item
@@ -15,4 +17,5 @@
         app:showAsAction="always"
         android:text="Log Out"
         android:title="Log Out" />
+
 </menu>
